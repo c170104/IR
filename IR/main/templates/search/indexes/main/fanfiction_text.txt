@@ -1,0 +1,4 @@
+{{ object.movie }}
+{{ object.title }}
+{{ object.author }}
+{{ object.passage }}
