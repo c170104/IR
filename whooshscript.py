@@ -26,6 +26,7 @@ else:
 
 writer = ix.writer()
 
+<<<<<<< HEAD
 # writer.add_document(
 #     title=u'Testing is this correction',
 #     author=u'Bill Gates',
@@ -65,6 +66,19 @@ while(True):
     else:
         break
             
+=======
+# LAWRANN PARSER
+
+writer.add_document(
+    title=u'Testing is this correction',
+    author=u'Bill Gates',
+    movie=u'Batman',
+    url=u'https://testingonetwo.com',
+    passage=u'Some super duper long ass passage that no one wants to read. I am having difficulties trying to think of what else to write.',
+    passage_summary=u'Some super duper long ass passage that no one wants to read.'
+)
+
+>>>>>>> 2e29cb18f1cee75c1f86ca0dc8543a7a67a28914
 writer.commit()
 
 

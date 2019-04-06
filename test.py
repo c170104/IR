@@ -1,6 +1,7 @@
 import os
 from whoosh.index import open_dir
 from whoosh.qparser import QueryParser
+from whoosh import scoring
 
 if not os.path.exists("index"):
     exit
