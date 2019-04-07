@@ -16,7 +16,7 @@ textfilecount = 0
 threads = list()
 porter = PorterStemmer()
 lancaster = LancasterStemmer()
-wd = os.getcwd() + "\\scrappedata\\"
+wd = os.getcwd() + "/scrappedata/"
 
 def getList(url):
     response3 = requests.get(url)
@@ -79,6 +79,8 @@ def getPassage(movieName,title,author, postUrl,textfilenumber):
             soup = BeautifulSoup(response2.text, 'html.parser')
             # Scraping passage
             passage = [s.get_text(separator=" ", strip=True) for s in soup.find_all( class_="storytext xcontrast_txt nocopy")]
+            passage = str(passage)
+            passage = passage[2:-2]
             try:
                 passagelist.append(passage)
                 ## Check for next chapter

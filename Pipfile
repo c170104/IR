@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 whoosh = "*"
 django = "*"
+bs4 = "*"
+nltk = "*"
 
 [requires]
 python_version = "3.6"
