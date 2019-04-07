@@ -8,9 +8,9 @@ if not os.path.exists("index"):
 ix = open_dir("index")
 
 with ix.searcher() as searcher:
-    print(list(ix.searcher().lexicon("movie")))  
+    # print(list(ix.searcher().lexicon("movie")))  
     # print(list(ix.searcher().lexicon("movie")))
-    # print(list(ix.searcher().lexicon("title")))
+    print(list(ix.searcher().lexicon("title")))
 
 # index = "passage"
 # search_query = "long"

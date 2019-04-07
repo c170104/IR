@@ -31,6 +31,7 @@ count = 0
 while(True):
     txtfile = (wd+"textfile%i.txt" % (count))
     if os.path.exists(txtfile):
+        print(count)
         with open(txtfile, 'r', encoding ="utf-8") as txt_file:
             datastore = json.load(txt_file)
             for i in range(len(datastore)):
@@ -44,12 +45,12 @@ while(True):
                 # print(s.encode("utf-8").decode("utf-8"))
                 
                 writer.add_document (
-                title = str(t, 'utf-8'),
-                author = str(a, 'utf-8'),
-                movie = str(m, 'utf-8'),
-                url = str(h, 'utf-8'),
-                passage = str(p, 'utf-8'),
-                passage_summary = str(s, 'utf-8'),
+                title = t,
+                author = a,
+                movie = m,
+                url = h,
+                passage = p,
+                passage_summary = s,
                 )
                 
         count = count + 1

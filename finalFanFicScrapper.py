@@ -26,7 +26,7 @@ def getList(url):
     moviename = list()
     count = 0
     for i in movielist:
-        if (count >= 103 and count <=107): ##103 2190 change this to change number of scrapp
+        if (count >= 551 and count <=1050): ##103 2190 change this to change number of scrapp
             movielink = 'https://www.fanfiction.net'+i['href']
             print(movielink)
             movielinklist.append(movielink)
@@ -68,7 +68,7 @@ def getPassage(movieName,title,author, postUrl,textfilenumber):
             txt_file = open(txtfile, 'w') 
             txt_file.write('[')
             txt_file.close
-        
+
     with open (txtfile,'a', encoding="utf-8") as txt_file: 
         response2 = requests.get(postUrl)
         passagelist = list()        
@@ -79,6 +79,8 @@ def getPassage(movieName,title,author, postUrl,textfilenumber):
             soup = BeautifulSoup(response2.text, 'html.parser')
             # Scraping passage
             passage = [s.get_text(separator=" ", strip=True) for s in soup.find_all( class_="storytext xcontrast_txt nocopy")]
+            passage = str(passage)
+            passage = passage[2:-2]
             try:
                 passagelist.append(passage)
                 ## Check for next chapter
@@ -103,16 +105,20 @@ def getPassage(movieName,title,author, postUrl,textfilenumber):
             print(uniqueID)
             spassage = ""
             for i in range(len(passagelist)):
-                p = str(passagelist[i]).replace('\\','\\\\')
+                p = str(passagelist[i]).replace('\\','')
                 p = str(p).replace('"','\\"')
-#                p = str(p).replace("'","\\'")
                 spassage = spassage + '[Chapter '+ str(i+1) + '] '+ str(p)
             summary = spassage[11:111]
-#            title = str(title).replace('"','\\"')
-#            author = str(author).replace('"','\\"')
-#            movieName = str(movieName).replace('"','\\')
+            while(True):
+                if (summary.endswith("\\")):
+                    summary = summary[:-1]
+                else:
+                    break
+            title = str(title).replace('"','\\"')
+            author = str(author).replace('"','\\"')
+            movieName = str(movieName).replace('/',' ')
             postUrl = postUrl[:-1]
-            txt_file.write('{"Movie":"' + movieName +'","Title":"'+title+'","Author":"'+author+'","Hyperlink":"'+postUrl+'","Passage":"'+spassage+'","Summary":"'+summary+'"},')
+            txt_file.write('{"Movie":"' + movieName +'","Title":"'+title+'","Author":"'+author+'","Hyperlink":"'+postUrl+'","Passage":"'+spassage+' ","Summary":"'+summary+'"},')
             uniqueID = uniqueID +1
         sys.exit()
         
@@ -141,7 +147,6 @@ getList('https://www.fanfiction.net/movie')
 count = 0
 while (True):
     txtfile = ("textfile%i.txt" %(count))
-#    if os.path.exists('C:\\Users\\Lawrann\\Desktop\\Y2S2\\IRscrapper\\' + txtfile):
     if os.path.exists(wd + txtfile):
         txtfile = (wd+"textfile%i.txt" %(count))
         with open(txtfile, 'rb+') as filehandle:
