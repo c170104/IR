@@ -11,11 +11,16 @@
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
         integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
-    <div class="container">
+    <div class="jumbotron">
         <br />
         <div class="row justify-content-center">
             <div class="col-12 col-md-10 col-lg-8">
-                <form class="card card-sm">
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <button class="dropdown-item active" type="submit" name="s" value="centre_code">Centre Code</button>
+                    <button class="dropdown-item " type="submit" name="s" value="centre_name" >Name</button>
+                    <button class="dropdown-item " type="submit" name="s" value="centre_area" >Area</button>
+                </div>
+                <form class="card card-sm" method="GET">
                     <div class="card-body row no-gutters align-items-center">
                         <div class="col-auto">
                             <i class="fas fa-search h4 text-body"></i>
@@ -23,7 +28,7 @@
                         <!--end of col-->
                         <div class="col">
                             <input class="form-control form-control-lg" type="search"
-                                placeholder="Search topics or keywords" name="q">
+                                placeholder="Search topics or keywords" name="query">
                         </div>
                         <!--end of col-->
                         <div class="col-auto">
@@ -36,4 +41,47 @@
             <!--end of col-->
         </div>
     </div>
+    {% if content %}
+        <div class="container" style="padding-bottom: 25px;">
+            <h2>Results</h2>
+        </div>
+
+        {% for c in content %}
+        <div class="container">     
+            <div class="row">
+                <h4><a href="{{ c.url }}">{{ c.title }}</a></h4>
+            </div>
+            <div class="row">
+                <p>{{ c.passage_summary }}</p>
+            </div>
+            <div class="row">
+                <p><b>Movie:</b> <i>{{ c.movie }}</i></p>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- PAGINATOR -->
+        {% for p in pages %}
+        <div class="container">
+            <div class="row">
+                <nav aria-label="...">
+                    <ul class="pagination">
+                        <li class="page-item {% if p.previous <= 0 %} disabled {% endif %}">
+                        <a class="page-link" href="?query={{ query }}&page={{ p.previous }}" tabindex="-1">Previous</a>
+                        </li>
+                        {% if p.previous > 0 %}
+                            <li class="page-item"><a class="page-link" href="?query={{ query }}&page={{ p.previous }}">{{ p.previous }}</a></li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?query={{ query }}&page={{ p.current }}">{{ p.current }} <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="?query={{ query }}&page={{ p.next }}">{{ p.next }}</a></li>
+                        <li class="page-item">
+                        <a class="page-link" href="?query={{ query }}&page={{ p.next }}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

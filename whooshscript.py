@@ -4,17 +4,19 @@ from whoosh.analysis import StemmingAnalyzer
 import os.path
 import json, os
 
-wd = os.getcwd() +"\\scrappedata\\"
+wd = os.getcwd() +"/scrappedata/"
 
 
 # Specify schema
 schema = Schema(
             title=              TEXT(stored=True, analyzer=StemmingAnalyzer()),
             author=             TEXT,
-            movie=              KEYWORD(stored=True),
+            movie=              KEYWORD(stored=True, lowercase=True),
             url=                ID(stored=True),
             passage=            TEXT(analyzer=StemmingAnalyzer()),
-            passage_summary=    STORED
+            passage_summary=    STORED,
+            meta_data=          STORED,
+            ending_type=        KEYWORD(stored=True, lowercase=True)
         )
 
 # Creates the index
@@ -25,7 +27,15 @@ else:
     ix = open_dir("index")
 
 writer = ix.writer()
-
+# writer.add_document(
+#     title=u'Testing is this correction',
+#     author=u'Bill Gates',
+#     movie=u'Batman',
+#     url=u'https://testingonetwo.com',
+#     passage=u'Some super duper long ass passage that no one wants to read. I am having difficulties trying to think of what else to write.',
+#     passage_summary=u'Some super duper long ass passage that no one wants to read.'
+# )
+print(wd)
 count = 0
 #keys Movie, Title, Author, Hyperlink, Passage, Summary
 while(True):
@@ -44,12 +54,12 @@ while(True):
                 # print(s.encode("utf-8").decode("utf-8"))
                 
                 writer.add_document (
-                title = str(t, 'utf-8'),
-                author = str(a, 'utf-8'),
-                movie = str(m, 'utf-8'),
-                url = str(h, 'utf-8'),
-                passage = str(p, 'utf-8'),
-                passage_summary = str(s, 'utf-8'),
+                title = t,
+                author = a,
+                movie = m,
+                url = h,
+                passage = p,
+                passage_summary = s,
                 )
                 
         count = count + 1
