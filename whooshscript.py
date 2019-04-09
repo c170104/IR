@@ -11,10 +11,12 @@ wd = os.getcwd() +"/scrappedata/"
 schema = Schema(
             title=              TEXT(stored=True, analyzer=StemmingAnalyzer()),
             author=             TEXT,
-            movie=              KEYWORD(stored=True),
+            movie=              KEYWORD(stored=True, lowercase=True),
             url=                ID(stored=True),
             passage=            TEXT(analyzer=StemmingAnalyzer()),
-            passage_summary=    STORED
+            passage_summary=    STORED,
+            meta_data=          STORED,
+            ending_type=        KEYWORD(stored=True, lowercase=True)
         )
 
 # Creates the index
@@ -25,7 +27,6 @@ else:
     ix = open_dir("index")
 
 writer = ix.writer()
-
 # writer.add_document(
 #     title=u'Testing is this correction',
 #     author=u'Bill Gates',
