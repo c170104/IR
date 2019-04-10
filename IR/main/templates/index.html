@@ -1,0 +1,117 @@
+{% extends "common/header.html" %}
+
+{% block content %}
+    <style>
+        input[type="search"], textarea {
+            outline: none;
+            box-shadow:none !important;
+            border: 0;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <div class="jumbotron">
+        <br />
+        <form method="GET">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-8">
+                    <div class="card card-sm">
+                        <div class="card-body row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <i class="fas fa-search h4 text-body"></i>
+                            </div>
+                            <!--end of col-->
+                            <div class="col">
+                                <input class="form-control form-control-lg" type="search"
+                                    placeholder="Search topics or keywords" name="query" {% if query != '' %} value= "{{ query }}" {% endif %}>
+                            </div>
+                            <!--end of col-->
+                            <div class="col-auto">
+                                <button class="btn btn-lg btn-success" type="submit">Search</button>
+                            </div>
+                            <!--end of col-->
+                        </div>
+                    </div>
+                </div>
+                <!--end of col-->
+            </div>
+            <div class="row justify-content-center" style="padding-top: 20px;">
+                <div class="col-12 col-md-10 col-lg-8">
+                    {% if content %}
+                        <div class="dropdown">
+                            <button class="btn btn-dark dropdown-toggle" type="button" aria-label="dropdownMenuButton"
+                                id="downdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Sort By
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <button class="dropdown-item {% if sort == '' %} active {% endif %}" type="submit"
+                                    name="sort" value="default">No Sort</button>
+                                <button class="dropdown-item {% if sort == 'title' %} active {% endif %}" type="submit" 
+                                    name="sort" value="title">Title</button>
+                            </div>
+                            <!-- <input type="hidden" name="page" value="{% if pages %}{{ pages.current }}{% endif %}" /> -->
+                            <!-- <input type="hidden" name="query" value="{% if query %}{{ query }}{% endif %}" /> -->
+                        </div>
+                    {% endif %}
+                
+                    <div class="col-3">
+                        Category Filter:
+                        <select class="form-control" id="category" name="category">
+                            <option {% if category == 'default' or category == '' %} selected {% endif %}  value="default">Default</option>
+                            <option {% if category == 'movie' %} selected {% endif %}  value="movie">Movie</option>
+                            <option {% if category == 'title' %} selected {% endif %}  value="title">Title</option>
+                            <option {% if category == 'passage' %} selected {% endif %}  value="passage">Passage</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% if content %}
+        <div class="container" style="padding-bottom: 25px;">
+            <h2>Results</h2>
+        </div>
+
+        {% for c in content %}
+        <div class="container">     
+            <div class="row">
+                <h4><a href="{{ c.url }}">{{ c.title }}</a></h4>
+            </div>
+            <div class="row">
+                <p>{{ c.passage_summary }}</p>
+            </div>
+            <div class="row">
+                <p><b>Movie:</b> <i>{{ c.movie }}</i></p>
+            </div>
+            <div class="row">
+                <p><b>Ending Vibe:</b> <i>{{ c.ending_type }}</i></p>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- PAGINATOR -->
+        {% for p in pages %}
+        <div class="container">
+            <div class="row">
+                <nav aria-label="...">
+                    <ul class="pagination">
+                        <li class="page-item {% if p.previous <= 0 %} disabled {% endif %}">
+                        <a class="page-link" href="?query={{ query }}&page={{ p.previous }}" tabindex="-1">Previous</a>
+                        </li>
+                        {% if p.previous > 0 %}
+                            <li class="page-item"><a class="page-link" href="?query={{ query }}&page={{ p.previous }}">{{ p.previous }}</a></li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?query={{ query }}&page={{ p.current }}">{{ p.current }} <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="?query={{ query }}&page={{ p.next }}">{{ p.next }}</a></li>
+                        <li class="page-item">
+                        <a class="page-link" href="?query={{ query }}&page={{ p.next }}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
