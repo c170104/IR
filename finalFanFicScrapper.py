@@ -5,18 +5,22 @@ Created on Thu Apr  4 22:25:07 2019
 @author: Lawrann
 """
 
-import requests, re, os, threading, sys
+import requests, re, os, threading, sys, nltk, time
 from bs4 import BeautifulSoup
 from threading import Thread
-from nltk.stem import PorterStemmer, LancasterStemmer
+from nltk.stem import WordNetLemmatizer
+from csv import writer
 
+
+
+wordnet_lemmatizer = WordNetLemmatizer()
 lock = threading.Lock()
 uniqueID = 10000000
 textfilecount = 0
 threads = list()
-porter = PorterStemmer()
-lancaster = LancasterStemmer()
-wd = os.getcwd() + "/scrappedata/"
+punctuation="?:!.,;"
+
+wd = os.getcwd() + "\\scrappedata"
 
 def getList(url):
     response3 = requests.get(url)
@@ -26,7 +30,7 @@ def getList(url):
     moviename = list()
     count = 0
     for i in movielist:
-        if (count >= 103 and count <=107): ##103 2190 change this to change number of scrapp
+        if (count >= 267 and count <=508): ##103 2190 1062<10
             movielink = 'https://www.fanfiction.net'+i['href']
             print(movielink)
             movielinklist.append(movielink)
@@ -43,8 +47,16 @@ def getList(url):
         i.join()
         
 def getMovie(movieUrl,movieName,textfilenumber):
-    response = requests.get(movieUrl)
-    authorList = getAuthors(movieUrl)
+    mostfavelink = "?&srt=4&lan=1&r=10"
+    rflag = True
+    while(rflag == True):
+        try:
+            response = requests.get(movieUrl+mostfavelink)
+            rflag = False
+        except:
+            time.sleep(2)
+
+    authorList = getAuthors(movieUrl+mostfavelink)
     linkPattern = re.compile(r'(/s/\d*/)') #href="/s/13194877/1/
     exit_flag = False
     while(exit_flag!=True):
@@ -62,7 +74,7 @@ def getMovie(movieUrl,movieName,textfilenumber):
         exit_flag= True
         
 def getPassage(movieName,title,author, postUrl,textfilenumber):
-    txtfile = (wd+"textfile%i.txt" %(textfilenumber))
+    txtfile = (wd + "\\textfile%i.txt" %(textfilenumber))
     with lock:
         if not os.path.exists(txtfile):
             txt_file = open(txtfile, 'w') 
@@ -70,17 +82,33 @@ def getPassage(movieName,title,author, postUrl,textfilenumber):
             txt_file.close
         
     with open (txtfile,'a', encoding="utf-8") as txt_file: 
-        response2 = requests.get(postUrl)
+        r2flag = True
+        while(r2flag == True):
+            try:
+                response2 = requests.get(postUrl)
+                r2flag = False
+            except:
+                time.sleep(2)
         passagelist = list()        
         chapter_exit_flag = False
         chapterCount = 1
+        metadataCount = 0
         ## For iterating through chapters
+        soup = BeautifulSoup(response2.text, 'html.parser')
+        metadata = soup.find_all(class_="xgray xcontrast_txt") ##metadata[count].get_text()
+
         while (chapter_exit_flag != True): 
             soup = BeautifulSoup(response2.text, 'html.parser')
+            
             # Scraping passage
             passage = [s.get_text(separator=" ", strip=True) for s in soup.find_all( class_="storytext xcontrast_txt nocopy")]
             passage = str(passage)
             passage = passage[2:-2]
+            while(True):
+                if (passage.endswith("\\")):
+                    passage = passage[:-1]
+                else:
+                    break
             try:
                 passagelist.append(passage)
                 ## Check for next chapter
@@ -89,7 +117,6 @@ def getPassage(movieName,title,author, postUrl,textfilenumber):
                 
                 if(str(nextChapter) == 'None'): 
                     chapter_exit_flag = True
-                    print('End of Chapter')
                 else:
                     ## Next Chapter
                     chapterCount = chapterCount + 1
@@ -101,21 +128,43 @@ def getPassage(movieName,title,author, postUrl,textfilenumber):
                 print('End of Chapter')
                 
         with lock:
+            metadata = metadata[metadataCount].get_text()
+            metadataCount = metadataCount + 1
             global uniqueID
             print(uniqueID)
             spassage = ""
             for i in range(len(passagelist)):
-                p = str(passagelist[i]).replace('\\','\\\\')
+                p = str(passagelist[i])
+                p = str(p).replace('\\','')
                 p = str(p).replace('"','\\"')
-#                p = str(p).replace("'","\\'")
                 spassage = spassage + '[Chapter '+ str(i+1) + '] '+ str(p)
             summary = spassage[11:111]
-#            title = str(title).replace('"','\\"')
-#            author = str(author).replace('"','\\"')
-#            movieName = str(movieName).replace('"','\\')
+            while(True):
+                if (summary.endswith("\\")):
+                    summary = summary[:-1]
+                else:
+                    break
+            lastchapter = passagelist[-1]
+            lastchapter = lastchapter.replace('\\','')
+            lastchapter = lastchapter.replace('"','\\"')
+            metadata = metadata.replace('\\','')
+            metadata = metadata.replace('"','\\"')
+            metadata = metadata.replace('/',' ')
             postUrl = postUrl[:-1]
-            txt_file.write('{"Movie":"' + movieName +'","Title":"'+title+'","Author":"'+author+'","Hyperlink":"'+postUrl+'","Passage":"'+spassage+'","Summary":"'+summary+'"},')
-            uniqueID = uniqueID +1
+            title = str(title).replace('"','\\"')
+            author = str(author).replace('"','\\"')
+            movieName = str(movieName).replace('/',' ')
+            txt_file.write('{"Movie":"' + movieName 
+                                + '","Title":"' + title 
+                                + '","Author":"' + author 
+                                + '","Hyperlink":"' + postUrl
+                                + '","Passage":"' + spassage 
+                                + '","LastChapter":"' + lastchapter 
+                                + '","Summary":"' + summary 
+                                + '","MetaData":"' + metadata
+                                +'"},')
+            uniqueID = uniqueID + 1
+            
         sys.exit()
         
 def getAuthors(url):
@@ -142,10 +191,9 @@ getList('https://www.fanfiction.net/movie')
            
 count = 0
 while (True):
-    txtfile = ("textfile%i.txt" %(count))
+    txtfile = (wd+"\\textfile%i.txt" %(count))
 #    if os.path.exists('C:\\Users\\Lawrann\\Desktop\\Y2S2\\IRscrapper\\' + txtfile):
-    if os.path.exists(wd + txtfile):
-        txtfile = (wd+"textfile%i.txt" %(count))
+    if os.path.exists( txtfile):
         with open(txtfile, 'rb+') as filehandle:
             filehandle.seek(-1, os.SEEK_END)
             filehandle.truncate()
