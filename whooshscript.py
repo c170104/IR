@@ -2,6 +2,10 @@ from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, STORED, ID, KEYWORD, TEXT
 from whoosh.analysis import StemmingAnalyzer
 from textblob import TextBlob
+
+# import nltk
+# nltk.download('punkt')
+
 import csv
 
 import os.path

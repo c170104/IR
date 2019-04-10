@@ -56,6 +56,14 @@ textblob = "*"
 python_version = "3.6"
 ```
 
+## Required Step
+
+nltk library TextBlob requires this code to be runned once to download the "punkt" library
+
+```bash
+nltk.download('punkt')
+```
+
 ## Indexing
 
 Due to GitHub file size limit, the indexes could not be uploaded.
